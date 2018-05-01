@@ -22,7 +22,11 @@ def calculate_specular(light, sreflect, view, normal):
     pass
 
 def limit_color(color):
-    pass
+	for i in range(len(color)):
+		if color[i] > 255:
+			color[i] = 255
+		if color[i] < 0:
+			color[i] = 0
 
 #vector functions
 def normalize(vector):
