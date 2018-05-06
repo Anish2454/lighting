@@ -54,6 +54,7 @@ def calculate_diffuse(light, dreflect, normal):
     scalar_mult(color, dot)
     distribute_constant(color, dreflect)
     #print "After: " + str(color)
+    limit_color(color)
     return map(int, color)
 
 def calculate_specular(light, sreflect, view, normal):
@@ -67,6 +68,7 @@ def calculate_specular(light, sreflect, view, normal):
     dot2 = dot_product(normal, view)
     distribute_constant(color, sreflect)
     scalar_mult(color, (dot2 ** SPECULAR_EXP))
+    limit_color(color)
     return map(int, color)
 
 def limit_color(color):

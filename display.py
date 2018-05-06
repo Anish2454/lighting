@@ -72,4 +72,3 @@ def display( screen ):
     p = Popen( ['display', ppm_name], stdin=PIPE, stdout = PIPE )
     p.communicate()
     remove(ppm_name)
-
