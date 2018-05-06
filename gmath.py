@@ -1,4 +1,5 @@
 import math
+from matrix import *
 from display import *
 
 AMBIENT = 0
@@ -8,32 +9,81 @@ LOCATION = 0
 COLOR = 1
 SPECULAR_EXP = 4
 
+def distribute_constant(color, const):
+    color[RED] = color[RED] * const[RED]
+    color[GREEN] = color[GREEN] * const[GREEN]
+    color[BLUE] = color[BLUE] * const[BLUE]
+
+def vector_subtract(a,b):
+    for i in range(len(a)):
+        a[i] = a[i]-b[i]
+
 #lighting functions
 def get_lighting(normal, view, ambient, light, areflect, dreflect, sreflect ):
-    pass
+    normalize(light[LOCATION])
+    normalize(view)
+    normalize(normal)
+
+    ret = []
+
+    ambient=calculate_ambient(ambient,areflect)
+    diffuse=calculate_diffuse(light,dreflect,normal)
+    specular=calculate_specular(light,sreflect,view,normal)
+
+    for i in range(3):
+        ret.append(ambient[i]+diffuse[i]+specular[i])
+    limit_color(ret)
+    #print ret
+    return ret
+
+
 
 def calculate_ambient(alight, areflect):
-    pass
+    color = alight[:]
+    distribute_constant(color, areflect)
+    limit_color(color)
+    return map(int, color)
 
 def calculate_diffuse(light, dreflect, normal):
-    pass
+    color = light[COLOR][:]
+    #print "Before: " + str(color)
+    pos = light[LOCATION]
+    dot = dot_product(normal, pos)
+    if dot < 0:
+        dot = 0
+    scalar_mult(color, dot)
+    distribute_constant(color, dreflect)
+    #print "After: " + str(color)
+    return map(int, color)
 
 def calculate_specular(light, sreflect, view, normal):
-    pass
+    color = light[COLOR][:]
+    dot1 = dot_product(normal, light[LOCATION])
+    if dot1 <= 0:
+        return [0,0,0]
+    prod1 = 2 * dot1
+    scalar_mult(normal, prod1)
+    vector_subtract(normal, light[LOCATION])
+    dot2 = dot_product(normal, view)
+    distribute_constant(color, sreflect)
+    scalar_mult(color, (dot2 ** SPECULAR_EXP))
+    return map(int, color)
 
 def limit_color(color):
-	for i in range(len(color)):
-		if color[i] > 255:
-			color[i] = 255
-		if color[i] < 0:
-			color[i] = 0
+    for i in range(len(color)):
+        if color[i] > 255:
+            color[i] = 255
+        if color[i] < 0:
+            color[i] = 0
 
 #vector functions
 def normalize(vector):
-    pass
+    scale = (1.0)/(math.sqrt((vector[0]*vector[0]) + (vector[1]*vector[1]) + (vector[2]*vector[2])))
+    scalar_mult(vector, scale)
+    return vector
 
 def dot_product(a, b):
-    pass
+    return (a[0]*b[0]) + (a[1]*b[1]) + (a[2]*b[2])
 
 def calculate_normal(polygons, i):
 
